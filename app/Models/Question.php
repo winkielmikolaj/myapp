@@ -23,11 +23,17 @@ class Question extends Model
         'order' => 'integer',
     ];
 
+    /**
+     * Każde pytanie należy do jednego quizu.
+     */
     public function quiz(): BelongsTo
     {
         return $this->belongsTo(Quiz::class);
     }
 
+    /**
+     * Odpowiedzi dostępne dla pytania.
+     */
     public function answers(): HasMany
     {
         return $this->hasMany(Answer::class);

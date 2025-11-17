@@ -7,6 +7,7 @@
 
 @section('content')
     <section class="space-y-10">
+        {{-- Pasek informacyjny z nazwą quizu i postępem --}}
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between" data-reveal>
             <div>
                 <p class="text-xs uppercase tracking-[0.35em] text-slate-400">Tryb quizu</p>
@@ -27,6 +28,7 @@
             </div>
         </div>
 
+        {{-- Karta pojedynczego pytania wraz z odpowiedziami --}}
         <div class="shell rounded-[28px] p-6 space-y-6" data-reveal>
             <p class="text-sm text-slate-300">Wartość pytania: <span class="font-semibold text-white">{{ $question->points }} pkt</span></p>
             <form method="POST" action="{{ route('quizzes.submit', $quiz) }}" class="space-y-8">

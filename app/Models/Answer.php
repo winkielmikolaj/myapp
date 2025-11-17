@@ -20,6 +20,9 @@ class Answer extends Model
         'is_correct' => 'boolean',
     ];
 
+    /**
+     * Każda odpowiedź należy do konkretnego pytania.
+     */
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);

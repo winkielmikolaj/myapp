@@ -2,6 +2,7 @@
 
 @section('content')
     <section class="space-y-10">
+        {{-- Sekcja hero z krótkim opisem aplikacji i statystykami --}}
         <div class="grid gap-8 lg:grid-cols-2">
             <div class="space-y-6" data-reveal>
                 <p class="text-xs uppercase tracking-[0.35em] text-slate-400">Quizy programistyczne</p>
@@ -57,6 +58,7 @@
             </div>
         </div>
 
+        {{-- Prosty opis przebiegu sesji, aby użytkownik wiedział czego oczekiwać --}}
         <section id="flow" class="space-y-6" data-reveal>
             <div>
                 <p class="text-xs uppercase tracking-[0.35em] text-slate-400">Przebieg sesji</p>

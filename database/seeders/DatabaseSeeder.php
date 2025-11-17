@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Zdefiniowane poniżej quizy służą jako bogaty zestaw danych startowych.
         $quizzes = [
             [
                 'title' => 'Laravel Essentials',
@@ -249,6 +250,7 @@ class DatabaseSeeder extends Seeder
                 $question = $quiz->questions()->create($questionData);
 
                 foreach ($answers as $answerData) {
+                    // Relacje Eloquent dbają o poprawne wypełnienie kluczy obcych.
                     $question->answers()->create($answerData);
                 }
             }

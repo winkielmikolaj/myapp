@@ -10,6 +10,9 @@ class QuizFlowTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Strona główna powinna ładować się poprawnie i zawierać nazwę aplikacji.
+     */
     public function test_home_page_displays_quiz_count(): void
     {
         $this->seed();
@@ -19,6 +22,9 @@ class QuizFlowTest extends TestCase
             ->assertSee('QuizApp');
     }
 
+    /**
+     * Widok listy quizów musi wyświetlać przycisk CTA, aby rozpocząć quiz.
+     */
     public function test_quizzes_index_lists_quizzes(): void
     {
         $this->seed();
@@ -28,6 +34,9 @@ class QuizFlowTest extends TestCase
             ->assertSee('Rozpocznij');
     }
 
+    /**
+     * Pełny scenariusz: odpowiedz na pytanie i sprawdź, czy wyniki są dostępne.
+     */
     public function test_quiz_flow_generates_results(): void
     {
         $this->seed();

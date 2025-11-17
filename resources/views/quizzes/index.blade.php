@@ -2,6 +2,7 @@
 
 @section('content')
     <section class="space-y-10">
+        {{-- Hero sekcja listy quizów --}}
         <div class="shell rounded-[28px] p-6" data-reveal>
             <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div class="space-y-4">
@@ -17,11 +18,13 @@
             </div>
         </div>
 
+        {{-- Informacja dla sytuacji, gdy brak danych --}}
         @if ($quizzes->isEmpty())
             <div class="shell rounded-3xl p-8 text-center text-slate-300" data-reveal>
                 Brak aktywnych quizów – dodaj nowe rekordy w seederze.
             </div>
         @else
+            {{-- Karty z poszczególnymi quizami --}}
             <div class="grid gap-6 md:grid-cols-2" data-reveal>
                 @foreach ($quizzes as $quiz)
                     <article class="shell flex flex-col gap-5 rounded-3xl p-6 transition hover:-translate-y-0.5">

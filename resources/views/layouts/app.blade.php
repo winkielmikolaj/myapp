@@ -47,6 +47,7 @@
         </style>
     </head>
     <body class="min-h-screen px-4 py-8 text-slate-100 antialiased md:px-6">
+        {{-- Główna kolumna aplikacji: nagłówek + karta z kontentem --}}
         <div class="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8">
             <header class="shell flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -65,6 +66,7 @@
                 </div>
             @endif
 
+            {{-- Obszar, w którym każdy widok wstawia własną zawartość --}}
             <main class="flex-1 shell p-6 md:p-8">
                 @yield('content')
             </main>

@@ -2,6 +2,7 @@
 
 @section('content')
     <section class="space-y-8">
+        {{-- Nagłówek wyników + szybkie statystyki --}}
         <div class="shell rounded-[28px] p-6" data-reveal>
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -26,6 +27,7 @@
             </div>
         </div>
 
+        {{-- Zestawienie szczegółowe wszystkich odpowiedzi --}}
         <div class="shell overflow-hidden rounded-[28px]" data-reveal>
             <table class="w-full divide-y divide-white/5 text-sm text-slate-100">
                 <thead class="bg-white/5 text-xs uppercase tracking-[0.3em] text-slate-400">

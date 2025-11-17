@@ -11,6 +11,9 @@ use Illuminate\View\View;
 
 class QuizController extends Controller
 {
+    /**
+     * Lista wszystkich aktywnych quizów wraz z liczbą pytań i sumą punktów.
+     */
     public function index(): View
     {
         $quizzes = Quiz::active()
@@ -22,6 +25,10 @@ class QuizController extends Controller
         return view('quizzes.index', compact('quizzes'));
     }
 
+    /**
+     * Prezentuje pojedynczy quiz krok po kroku.
+     * Korzystamy z query stringa ?step= aby móc wrócić do poprzedniego pytania.
+     */
     public function show(Request $request, Quiz $quiz): View
     {
         abort_unless($quiz->is_active, 404);
@@ -46,6 +53,9 @@ class QuizController extends Controller
         ]);
     }
 
+    /**
+     * Zapisuje odpowiedź użytkownika i decyduje, czy przejść dalej, czy pokazać wynik.
+     */
     public function submit(Request $request, Quiz $quiz): RedirectResponse
     {
         abort_unless($quiz->is_active, 404);
@@ -84,6 +94,9 @@ class QuizController extends Controller
         return redirect()->route('quizzes.show', [$quiz, 'step' => $currentStep + 1]);
     }
 
+    /**
+     * Renderuje ekran wyników bazując na danych trzymanych chwilowo w sesji.
+     */
     public function results(Quiz $quiz): View
     {
         $result = $this->getStoredResult($quiz->id);
@@ -96,44 +109,68 @@ class QuizController extends Controller
         ]);
     }
 
+    /**
+     * Unikatowy klucz sesji trzymający odpowiedzi w trakcie bieżącego quizu.
+     */
     protected function answersSessionKey(int $quizId): string
     {
         return "quiz_answers.$quizId";
     }
 
+    /**
+     * Nazwa klucza sesji przechowującego gotowy wynik.
+     */
     protected function resultSessionKey(int $quizId): string
     {
         return "quiz_results.$quizId";
     }
 
+    /**
+     * Odczytuje zapisane wcześniej odpowiedzi (mapa question_id => answer_id).
+     */
     protected function getStoredAnswers(int $quizId): array
     {
         return session()->get($this->answersSessionKey($quizId), []);
     }
 
+    /**
+     * Nadpisuje odpowiedzi w sesji – dzięki temu możemy budować quiz krokowo.
+     */
     protected function storeAnswers(int $quizId, array $answers): void
     {
         session()->put($this->answersSessionKey($quizId), $answers);
     }
 
+    /**
+     * Czyści odpowiedzi po zakończeniu quizu, żeby nowa sesja startowała na czysto.
+     */
     protected function clearAnswers(int $quizId): void
     {
         session()->forget($this->answersSessionKey($quizId));
     }
 
+    /**
+     * Odkłada wynik końcowy do sesji – wyświetlamy go tuż po przekierowaniu.
+     */
     protected function storeResult(int $quizId, array $result): void
     {
         session()->put($this->resultSessionKey($quizId), $result);
     }
 
+    /**
+     * Pobiera ostatni wynik z sesji.
+     */
     protected function getStoredResult(int $quizId): ?array
     {
         return session()->get($this->resultSessionKey($quizId));
     }
 
+    /**
+     * Składa tablicę wyników w czytelnej strukturze dla widoku.
+     */
     protected function buildResults(Quiz $quiz, array $answersMap): array
     {
-        $quiz->loadMissing('questions.answers');
+        $quiz->loadMissing('questions.answers'); // eager load, by uniknąć N+1
 
         $details = [];
         $correctCount = 0;
