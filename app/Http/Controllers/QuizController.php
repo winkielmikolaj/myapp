@@ -7,6 +7,7 @@ use App\Models\Question;
 use App\Models\Quiz;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class QuizController extends Controller
@@ -43,13 +44,15 @@ class QuizController extends Controller
 
         $currentQuestion = $questions[$currentStep - 1];
         $answersMap = $this->getStoredAnswers($quiz->id);
+        $storedAnswer = $this->resolveAnswerPayload($answersMap, $currentQuestion->id);
 
         return view('quizzes.show', [
             'quiz' => $quiz,
             'question' => $currentQuestion,
             'currentStep' => $currentStep,
             'totalQuestions' => $totalQuestions,
-            'selectedAnswerId' => $answersMap[$currentQuestion->id] ?? null,
+            'selectedAnswerId' => $storedAnswer['answer_id'],
+            'typedAnswer' => $storedAnswer['answer_text'],
         ]);
     }
 
@@ -60,28 +63,46 @@ class QuizController extends Controller
     {
         abort_unless($quiz->is_active, 404);
 
-        $validated = $request->validate([
+        $baseData = $request->validate([
             'question_id' => ['required', 'integer'],
-            'answer_id' => ['required', 'integer'],
             'step' => ['required', 'integer', 'min:1'],
             'is_final' => ['nullable', 'boolean'],
         ]);
 
         /** @var Question $question */
-        $question = $quiz->questions()->findOrFail($validated['question_id']);
+        $question = $quiz->questions()->findOrFail($baseData['question_id']);
 
-        /** @var Answer|null $answer */
-        $answer = $question->answers()->whereKey($validated['answer_id'])->first();
+        if ($question->is_open) {
+            $input = $request->validate([
+                'answer_text' => ['required', 'string', 'max:2000'],
+            ]);
 
-        abort_if(is_null($answer), 422, 'Wybrana odpowiedź jest nieprawidłowa.');
+            $answerPayload = [
+                'answer_id' => null,
+                'answer_text' => $input['answer_text'],
+            ];
+        } else {
+            $input = $request->validate([
+                'answer_id' => ['required', 'integer'],
+            ]);
+
+            /** @var Answer|null $answer */
+            $answer = $question->answers()->whereKey($input['answer_id'])->first();
+            abort_if(is_null($answer), 422, 'Wybrana odpowiedź jest nieprawidłowa.');
+
+            $answerPayload = [
+                'answer_id' => $answer->id,
+                'answer_text' => null,
+            ];
+        }
 
         $answersMap = $this->getStoredAnswers($quiz->id);
-        $answersMap[$question->id] = $answer->id;
+        $answersMap[$question->id] = $answerPayload;
         $this->storeAnswers($quiz->id, $answersMap);
 
         $totalQuestions = $quiz->questions()->count();
-        $currentStep = (int)$validated['step'];
-        $isFinal = (bool)($validated['is_final'] ?? false) || $currentStep >= $totalQuestions;
+        $currentStep = (int)$baseData['step'];
+        $isFinal = (bool)($baseData['is_final'] ?? false) || $currentStep >= $totalQuestions;
 
         if ($isFinal) {
             $result = $this->buildResults($quiz, $answersMap);
@@ -176,10 +197,19 @@ class QuizController extends Controller
         $correctCount = 0;
 
         foreach ($quiz->questions as $question) {
-            $selectedId = $answersMap[$question->id] ?? null;
-            $selectedAnswer = $question->answers->firstWhere('id', $selectedId);
-            $correctAnswer = $question->answers->firstWhere('is_correct', true);
-            $isCorrect = $selectedAnswer?->is_correct ?? false;
+            $payload = $this->resolveAnswerPayload($answersMap, $question->id);
+
+            if ($question->is_open) {
+                $isCorrect = $this->isOpenAnswerCorrect($payload['answer_text'], $question->correct_answer_text);
+                $selectedAnswerText = $payload['answer_text'];
+                $correctAnswerText = $question->correct_answer_text;
+            } else {
+                $selectedAnswer = $question->answers->firstWhere('id', $payload['answer_id']);
+                $correctAnswer = $question->answers->firstWhere('is_correct', true);
+                $isCorrect = $selectedAnswer?->is_correct ?? false;
+                $selectedAnswerText = $selectedAnswer?->answer_text;
+                $correctAnswerText = $correctAnswer?->answer_text;
+            }
 
             if ($isCorrect) {
                 $correctCount++;
@@ -188,8 +218,8 @@ class QuizController extends Controller
             $details[] = [
                 'question_text' => $question->question_text,
                 'points' => $question->points,
-                'selected_answer' => $selectedAnswer?->answer_text,
-                'correct_answer' => $correctAnswer?->answer_text,
+                'selected_answer' => $selectedAnswerText,
+                'correct_answer' => $correctAnswerText,
                 'is_correct' => $isCorrect,
             ];
         }
@@ -202,5 +232,45 @@ class QuizController extends Controller
             'percentage' => round(($correctCount / $totalQuestions) * 100),
             'details' => $details,
         ];
+    }
+
+    /**
+     * Standaryzuje strukturę odpowiedzi z sesji (obsługuje starszy format int).
+     */
+    protected function resolveAnswerPayload(array $answersMap, int $questionId): array
+    {
+        $defaults = ['answer_id' => null, 'answer_text' => null];
+        $raw = $answersMap[$questionId] ?? null;
+
+        if (is_array($raw)) {
+            return array_merge($defaults, $raw);
+        }
+
+        if ($raw === null) {
+            return $defaults;
+        }
+
+        return ['answer_id' => $raw, 'answer_text' => null];
+    }
+
+    /**
+     * Porównuje odpowiedź otwartą w sposób nieczuły na wielkość liter i białe znaki.
+     */
+    protected function isOpenAnswerCorrect(?string $userInput, ?string $expected): bool
+    {
+        if ($expected === null) {
+            return false;
+        }
+
+        return $this->normalizeAnswerText($userInput) === $this->normalizeAnswerText($expected);
+    }
+
+    protected function normalizeAnswerText(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return Str::lower(trim($value));
     }
 }

@@ -16,11 +16,14 @@ class Question extends Model
         'question_text',
         'points',
         'order',
+        'is_open',
+        'correct_answer_text',
     ];
 
     protected $casts = [
         'points' => 'integer',
         'order' => 'integer',
+        'is_open' => 'boolean',
     ];
 
     /**

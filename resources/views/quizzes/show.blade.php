@@ -44,22 +44,40 @@
                     </div>
                 </div>
 
-                <fieldset class="grid gap-4">
-                    <legend class="sr-only">Odpowiedzi</legend>
-                    @foreach ($question->answers as $answer)
-                        <label class="flex cursor-pointer items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-slate-100 transition hover:bg-white/10">
-                            <input
-                                type="radio"
-                                name="answer_id"
-                                value="{{ $answer->id }}"
-                                class="h-5 w-5 accent-indigo-500"
-                                {{ (string) $selectedAnswerId === (string) $answer->id ? 'checked' : '' }}
-                                required
-                            >
-                            <span class="text-base">{{ $answer->answer_text }}</span>
-                        </label>
-                    @endforeach
-                </fieldset>
+                @if ($question->is_open)
+                    <div class="space-y-3">
+                        <label for="answer_text" class="text-sm font-semibold text-slate-200">Twoja odpowiedź</label>
+                        <textarea
+                            id="answer_text"
+                            name="answer_text"
+                            rows="4"
+                            class="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-base text-white placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none"
+                            required>{{ old('answer_text', $typedAnswer) }}</textarea>
+                        @error('answer_text')
+                            <p class="text-sm text-rose-300">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @else
+                    <fieldset class="grid gap-4">
+                        <legend class="sr-only">Odpowiedzi</legend>
+                        @foreach ($question->answers as $answer)
+                            <label class="flex cursor-pointer items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-slate-100 transition hover:bg-white/10">
+                                <input
+                                    type="radio"
+                                    name="answer_id"
+                                    value="{{ $answer->id }}"
+                                    class="h-5 w-5 accent-indigo-500"
+                                    {{ (string) old('answer_id', $selectedAnswerId) === (string) $answer->id ? 'checked' : '' }}
+                                    required
+                                >
+                                <span class="text-base">{{ $answer->answer_text }}</span>
+                            </label>
+                        @endforeach
+                        @error('answer_id')
+                            <p class="text-sm text-rose-300">{{ $message }}</p>
+                        @enderror
+                    </fieldset>
+                @endif
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <a href="{{ route('quizzes.index') }}" class="text-sm font-medium text-slate-400 hover:text-white">

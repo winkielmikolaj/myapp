@@ -235,6 +235,53 @@ class DatabaseSeeder extends Seeder
                     ],
                 ],
             ],
+            [
+                'title' => 'Open Response Mastery',
+                'description' => 'Pięć pytań otwartych wymagających pełnej odpowiedzi tekstowej.',
+                'time_limit' => 10,
+                'questions' => [
+                    [
+                        'question_text' => 'Jak nazywa się wzorzec architektoniczny używany w Laravel do rozdzielenia logiki aplikacji?',
+                        'points' => 2,
+                        'order' => 1,
+                        'is_open' => true,
+                        'correct_answer_text' => 'Model View Controller',
+                        'answers' => [],
+                    ],
+                    [
+                        'question_text' => 'Jakim poleceniem w CLI uruchomisz wszystkie migracje w Laravel?',
+                        'points' => 1,
+                        'order' => 2,
+                        'is_open' => true,
+                        'correct_answer_text' => 'php artisan migrate',
+                        'answers' => [],
+                    ],
+                    [
+                        'question_text' => 'Podaj nazwę funkcji PHP, która służy do filtrowania elementów tablicy przy użyciu callbacku.',
+                        'points' => 2,
+                        'order' => 3,
+                        'is_open' => true,
+                        'correct_answer_text' => 'array_filter',
+                        'answers' => [],
+                    ],
+                    [
+                        'question_text' => 'Które rozszerzenie PHP odpowiada za obsługę baz danych poprzez PDO?',
+                        'points' => 2,
+                        'order' => 4,
+                        'is_open' => true,
+                        'correct_answer_text' => 'pdo',
+                        'answers' => [],
+                    ],
+                    [
+                        'question_text' => 'Jak nazywa się plik konfiguracyjny odpowiedzialny za ustawienia połączenia z bazą danych w Laravel?',
+                        'points' => 1,
+                        'order' => 5,
+                        'is_open' => true,
+                        'correct_answer_text' => 'config/database.php',
+                        'answers' => [],
+                    ],
+                ],
+            ],
         ];
 
         foreach ($quizzes as $quizData) {
