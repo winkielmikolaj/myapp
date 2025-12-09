@@ -57,6 +57,17 @@
                 <nav class="flex flex-wrap gap-3 text-sm text-slate-300">
                     <a href="{{ route('home') }}" class="accent-border rounded-full px-4 py-1.5 hover:text-white {{ request()->routeIs('home') ? 'bg-white/10 text-white' : '' }}">Strona główna</a>
                     <a href="{{ route('quizzes.index') }}" class="accent-border rounded-full px-4 py-1.5 hover:text-white {{ request()->routeIs('quizzes.*') ? 'bg-white/10 text-white' : '' }}">Quizy</a>
+                    @auth
+                        @if(auth()->user()->is_admin)
+                            <a href="{{ route('admin.quizzes.index') }}" class="accent-border rounded-full px-4 py-1.5 hover:text-white {{ request()->routeIs('admin.*') ? 'bg-white/10 text-white' : '' }}">Panel Admin</a>
+                            <form action="{{ route('logout') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="accent-border rounded-full px-4 py-1.5 hover:text-white">Wyloguj</button>
+                            </form>
+                        @endif
+                    @else
+                        <a href="{{ route('login') }}" class="accent-border rounded-full px-4 py-1.5 hover:text-white {{ request()->routeIs('login') ? 'bg-white/10 text-white' : '' }}">Logowanie</a>
+                    @endauth
                 </nav>
             </header>
 

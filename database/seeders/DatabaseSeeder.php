@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Utwórz użytkownika administratora
+        $this->call(AdminUserSeeder::class);
+
         // Zdefiniowane poniżej quizy służą jako bogaty zestaw danych startowych.
         $quizzes = [
             [

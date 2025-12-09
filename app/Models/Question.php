@@ -35,6 +35,22 @@ class Question extends Model
     }
 
     /**
+     * Pobiera pytanie w kontekście quizu (dla route model binding).
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'id';
+    }
+
+    /**
+     * Scope dla route model binding - zapewnia, że pytanie należy do quizu.
+     */
+    public function scopeForQuiz($query, Quiz $quiz)
+    {
+        return $query->where('quiz_id', $quiz->id);
+    }
+
+    /**
      * Odpowiedzi dostępne dla pytania.
      */
     public function answers(): HasMany
