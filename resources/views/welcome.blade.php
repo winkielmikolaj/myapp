@@ -1,3 +1,7 @@
+{{-- 
+    Widok strony głównej aplikacji.
+    Wyświetla wprowadzenie do aplikacji, statystyki (liczba quizów) oraz opis jak działa system quizów.
+--}}
 @extends('layouts.app', ['title' => 'QuizApp'])
 
 @section('content')
@@ -64,14 +68,17 @@
                 <p class="text-xs uppercase tracking-[0.35em] text-slate-400">Przebieg sesji</p>
                 <h2 class="text-3xl font-semibold text-white">Jak to działa?</h2>
             </div>
+            {{-- Trzy kroki procesu quizu --}}
             <div class="grid gap-4 md:grid-cols-3">
                 @php
+                    // Definicja kroków procesu quizu
                     $steps = [
                         ['title' => 'Wybierz quiz', 'desc' => 'Lista obejmuje opis, liczbę pytań oraz ewentualny limit czasu.'],
                         ['title' => 'Odpowiadaj po kolei', 'desc' => 'Każde pytanie to osobna karta z prostym licznikiem i jasno oznaczonymi odpowiedziami.'],
                         ['title' => 'Przejrzyj wyniki', 'desc' => 'Podsumowanie pokazuje poprawne odpowiedzi, procent oraz Twoje wybory.'],
                     ];
                 @endphp
+                {{-- Iteracja przez kroki i wyświetlenie ich jako karty --}}
                 @foreach ($steps as $index => $step)
                     <div class="shell rounded-3xl p-5">
                         <p class="text-sm text-slate-400">Krok {{ $index + 1 }}</p>

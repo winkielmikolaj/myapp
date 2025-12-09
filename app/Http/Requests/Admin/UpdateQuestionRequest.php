@@ -4,10 +4,19 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Klasa walidacji żądania aktualizacji istniejącego pytania.
+ * 
+ * Sprawdza poprawność danych przed zaktualizowaniem pytania w bazie danych.
+ * Obsługuje zarówno pytania otwarte jak i zamknięte.
+ * Wymaga, aby użytkownik był zalogowany i miał uprawnienia administratora.
+ */
 class UpdateQuestionRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Określa, czy użytkownik ma uprawnienia do wykonania tego żądania.
+     * 
+     * @return bool True, jeśli użytkownik jest zalogowany i jest administratorem
      */
     public function authorize(): bool
     {
@@ -15,7 +24,10 @@ class UpdateQuestionRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Zwraca reguły walidacji dla danych żądania.
+     * 
+     * Reguły są identyczne jak w StoreQuestionRequest, ponieważ aktualizacja
+     * wymaga tych samych danych co tworzenie.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */

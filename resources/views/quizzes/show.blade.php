@@ -1,5 +1,12 @@
+{{-- 
+    Widok wyświetlający pojedyncze pytanie w quizie.
+    Użytkownik widzi jedno pytanie na raz i może nawigować między pytaniami.
+    Obsługuje zarówno pytania otwarte (textarea) jak i zamknięte (radio buttons).
+--}}
 @php
+    // Obliczenie, czy to ostatnie pytanie w quizie
     $isLastQuestion = $currentStep === $totalQuestions;
+    // Obliczenie postępu w procentach (0-100)
     $progress = round(($currentStep / $totalQuestions) * 100);
 @endphp
 
@@ -33,18 +40,23 @@
             <p class="text-sm text-slate-300">Wartość pytania: <span class="font-semibold text-white">{{ $question->points }} pkt</span></p>
             <form method="POST" action="{{ route('quizzes.submit', $quiz) }}" class="space-y-8">
                 @csrf
+                {{-- Ukryte pola formularza przekazujące dane do kontrolera --}}
                 <input type="hidden" name="question_id" value="{{ $question->id }}">
                 <input type="hidden" name="step" value="{{ $currentStep }}">
                 <input type="hidden" name="is_final" value="{{ $isLastQuestion ? 1 : 0 }}">
 
+                {{-- Treść pytania i pasek postępu --}}
                 <div class="space-y-4">
                     <h2 class="text-2xl font-semibold text-white">{{ $question->question_text }}</h2>
+                    {{-- Wizualny pasek postępu pokazujący, ile pytań zostało rozwiązanych --}}
                     <div class="h-2 w-full rounded-full bg-white/5">
                         <div class="h-full rounded-full bg-indigo-500/80 transition-all" style="width: {{ $progress }}%"></div>
                     </div>
                 </div>
 
+                {{-- Warunkowe wyświetlanie - pytania otwarte vs zamknięte --}}
                 @if ($question->is_open)
+                    {{-- Pole tekstowe dla pytań otwartych - użytkownik wpisuje odpowiedź --}}
                     <div class="space-y-3">
                         <label for="answer_text" class="text-sm font-semibold text-slate-200">Twoja odpowiedź</label>
                         <textarea
@@ -53,11 +65,13 @@
                             rows="4"
                             class="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-base text-white placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none"
                             required>{{ old('answer_text', $typedAnswer) }}</textarea>
+                        {{-- Wyświetlanie błędów walidacji dla pola answer_text --}}
                         @error('answer_text')
                             <p class="text-sm text-rose-300">{{ $message }}</p>
                         @enderror
                     </div>
                 @else
+                    {{-- Lista odpowiedzi dla pytań zamkniętych - użytkownik wybiera jedną opcję --}}
                     <fieldset class="grid gap-4">
                         <legend class="sr-only">Odpowiedzi</legend>
                         @foreach ($question->answers as $answer)
@@ -95,12 +109,15 @@
     </section>
 @endsection
 
+{{-- Skrypt obsługujący timer quizu (jeśli quiz ma limit czasu) --}}
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Znajdź element timera na stronie
             const timer = document.querySelector('[data-timer]');
-            if (!timer) return;
+            if (!timer) return; // Jeśli nie ma timera, zakończ
 
+            // Pobierz pozostały czas w sekundach z atrybutu data-remaining
             let remaining = parseInt(timer.dataset.remaining, 10);
             if (Number.isNaN(remaining) || remaining <= 0) {
                 timer.textContent = '00:00';
@@ -108,19 +125,24 @@
             }
 
             const wrapper = timer.closest('[data-timer-wrapper]');
+            
+            // Funkcja aktualizująca wyświetlanie timera co sekundę
             const update = () => {
+                // Oblicz minuty i sekundy z pozostałego czasu
                 const minutes = String(Math.max(0, Math.floor(remaining / 60))).padStart(2, '0');
                 const seconds = String(Math.max(0, remaining % 60)).padStart(2, '0');
                 timer.textContent = `${minutes}:${seconds}`;
 
+                // Jeśli czas się skończył, zmień styl na czerwony i zatrzymaj timer
                 if (remaining <= 0) {
                     wrapper?.classList.add('border-rose-400/30', 'bg-rose-500/10', 'text-rose-200');
                     clearInterval(interval);
                     return;
                 }
-                remaining -= 1;
+                remaining -= 1; // Zmniejsz pozostały czas o 1 sekundę
             };
 
+            // Uruchom timer od razu i aktualizuj co sekundę
             update();
             const interval = setInterval(update, 1000);
         });

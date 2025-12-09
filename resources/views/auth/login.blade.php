@@ -1,14 +1,20 @@
+{{-- 
+    Widok formularza logowania dla administratorów.
+    Tylko użytkownicy z uprawnieniami administratora (is_admin = true) mogą się zalogować.
+--}}
 @extends('layouts.app', ['title' => 'Logowanie Administratora'])
 
 @section('content')
     <div class="max-w-md mx-auto space-y-6">
+        {{-- Nagłówek formularza --}}
         <div class="text-center">
             <h1 class="text-3xl font-semibold text-white">Logowanie Administratora</h1>
             <p class="text-slate-400 mt-2">Zaloguj się, aby uzyskać dostęp do panelu administracyjnego</p>
         </div>
 
+        {{-- Formularz logowania --}}
         <form method="POST" action="{{ route('login') }}" class="space-y-6">
-            @csrf
+            @csrf {{-- Token CSRF dla bezpieczeństwa --}}
 
             <div>
                 <label for="email" class="block text-sm font-semibold text-slate-200 mb-2">

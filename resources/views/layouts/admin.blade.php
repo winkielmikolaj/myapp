@@ -1,6 +1,12 @@
 <!DOCTYPE html>
+{{-- 
+    Layout panelu administracyjnego.
+    Używany przez wszystkie widoki związane z zarządzaniem quizami i pytaniami.
+    Zawiera nagłówek z nawigacją, obszar na komunikaty i błędy, oraz sekcję główną na treść.
+--}}
 <html lang="pl">
     <head>
+        {{-- Podstawowe meta tagi --}}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ $title ?? 'Panel Administratora - QuizApp' }}</title>
@@ -54,12 +60,14 @@
                 </nav>
             </header>
 
+            {{-- Komunikat statusu (sukces) wyświetlany na górze strony --}}
             @if (session('status'))
                 <div class="shell border border-emerald-500/20 px-4 py-3 text-sm text-emerald-300">
                     {{ session('status') }}
                 </div>
             @endif
 
+            {{-- Wyświetlanie błędów walidacji, jeśli występują --}}
             @if ($errors->any())
                 <div class="shell border border-rose-500/20 px-4 py-3">
                     <p class="text-sm font-semibold text-rose-300 mb-2">Wystąpiły błędy:</p>
@@ -71,6 +79,7 @@
                 </div>
             @endif
 
+            {{-- Obszar główny - każdy widok wstawia tutaj swoją zawartość przez @yield('content') --}}
             <main class="flex-1 shell p-6 md:p-8">
                 @yield('content')
             </main>

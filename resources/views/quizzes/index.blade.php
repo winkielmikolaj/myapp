@@ -1,8 +1,12 @@
+{{-- 
+    Widok wyświetlający listę wszystkich aktywnych quizów.
+    Użytkownik może zobaczyć tytuł, opis, liczbę pytań, limit czasu i sumę punktów dla każdego quizu.
+--}}
 @extends('layouts.app', ['title' => 'Quizy'])
 
 @section('content')
     <section class="space-y-10">
-        {{-- Hero sekcja listy quizów --}}
+        {{-- Hero sekcja listy quizów - nagłówek z opisem i statystykami --}}
         <div class="shell rounded-[28px] p-6" data-reveal>
             <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div class="space-y-4">
